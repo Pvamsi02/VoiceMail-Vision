@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sent</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Arial", sans-serif;
+      }
+
+      .container {
+        margin-top: 50px;
+        background-color: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #28a745;
+        margin-bottom: 20px;
+      }
+
+      h3 {
+        color: #007bff;
+        margin-bottom: 15px;
+      }
+
+      li {
+        margin-bottom: 25px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 15px;
+      }
+
+      p {
+        color: #555;
+      }
+
+      audio {
+        margin-top: 10px;
+      }
+
+      .back-link {
+        margin-top: 20px;
+        display: block;
+      }
+    </style>
+  </head>
+  <body onmousedown="readSentContent(event)">
+    <div class="container">
+      <h1 class="text-center">Sent Emails</h1>
+      <p class="text-center">{{ message }}</p>
+
+      <h3>Emails in Sent Folder:</h3>
+      {% if sent_emails %}
+      <ul class="list-unstyled">
+        {% for email in sent_emails %}
+        <li>
+          <strong>Subject:</strong> {{ email.subject }}<br />
+          <strong>To:</strong> {{ email.to }}<br />
+          <strong>Body:</strong> {{ email.body|slice:":300" }}...<br />
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No emails in Sent folder.</p>
+      {% endif %}
+
+      <a href="{% url 'homepage:options' %}" class="btn btn-primary back-link"
+        >Back to Options</a
+      >
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      function readSentContent(event) {
+        const message = "{{ message|escapejs }}";
+        const emails = `{% for email in sent_emails %}
+          Subject: {{ email.subject }}. 
+          To: {{ email.to }}. 
+          Body: {{ email.body|slice:":300" }}... 
+        {% endfor %}`;
+        const fullContent = `${message} ${emails}`;
+        const speech = new SpeechSynthesisUtterance(fullContent);
+        window.speechSynthesis.speak(speech);
+      }
+    </script>
+  </body>
+</html>

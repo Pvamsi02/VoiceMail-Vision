@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inbox</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f4f4f4;
+        font-family: "Arial", sans-serif;
+      }
+
+      .container {
+        margin-top: 50px;
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        color: #007bff;
+        margin-bottom: 20px;
+      }
+
+      h3 {
+        color: #28a745;
+        margin-bottom: 15px;
+      }
+
+      li {
+        margin-bottom: 25px;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 15px;
+      }
+
+      p {
+        color: #555;
+      }
+
+      .email-subject {
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .email-from {
+        color: #28a745;
+      }
+
+      .email-body {
+        color: #555;
+      }
+
+      audio {
+        margin-top: 10px;
+      }
+
+      .back-link {
+        margin-top: 20px;
+        display: block;
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .back-link:hover {
+        background-color: #0056b3;
+        text-decoration: none;
+        color: white;
+      }
+    </style>
+  </head>
+  <body onmousedown="readSentContent(event)">
+    <div class="container">
+      <h1 class="text-center">Your Inbox</h1>
+      <p class="text-center">{{ message }}</p>
+
+      <h3>Unread Emails:</h3>
+      {% if unread_emails %}
+      <ul class="list-unstyled">
+        {% for email in unread_emails %}
+        <li
+          id="email-{{ loop.index }}"
+          class="email-item"
+          data-subject="{{ email.subject }}"
+          data-from="{{ email.from }}"
+          data-body="{{ email.body }}"
+        >
+          <span class="email-subject">Subject:</span> {{ email.subject }}<br />
+          <span class="email-from">From:</span> {{ email.from }}<br />
+          <span class="email-body">Body:</span> {{ email.body|slice:":300"
+          }}...<br />
+
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No unread emails available.</p>
+      {% endif %}
+
+      <a href="{% url 'homepage:options' %}" class="back-link"
+        >Back to Options</a
+      >
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      
+      function readSentContent(event) {
+        const message = "{{ message|escapejs }}";
+        const emails = `{% for email in sent_emails %}
+          Subject: {{ email.subject }}. 
+          To: {{ email.to }}. 
+          Body: {{ email.body|slice:":300" }}... 
+        {% endfor %}`;
+        const fullContent = `${message} ${emails}`;
+        const speech = new SpeechSynthesisUtterance(fullContent);
+        window.speechSynthesis.speak(speech);
+      }
+    </script>
+  </body>
+</html>
